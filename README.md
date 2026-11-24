@@ -4,7 +4,7 @@
 
 Built for **#BuildHybridAI 2026**, targeting **Web / Chrome** and the **Best Web/Chrome App** category while keeping the product eligible for the Grand Prize ladder.
 
-> Current status: **connected to the real Firebase project `clearbrief-hybrid-ai`.** The web config is built into `src/config.js` and was verified locally on 25 Nov 2026 (SDK initializes, AI instance and model objects construct, and Google's Firebase Installations server accepted the project/API key/app ID and issued tokens). Real Gemini generation is the next verification step: it needs an App Check token — a registered debug token for localhost, or reCAPTCHA Enterprise for the production domain — and Chrome Desktop 139+ for Gemini Nano. Demo mode remains available as a fallback. See **§6** for the exact remaining steps.
+> Current status: **connected to the real Firebase project `clearbrief-hybrid-ai`.** The web config is built into `src/config.js` and was verified locally on 25 Nov 2026 (SDK initializes, AI instance and model objects construct, and Google's Firebase Installations server accepted the project/API key/app ID and issued tokens). Production App Check is registered in the Console (reCAPTCHA Enterprise) and wired into `src/config.js`, so the live site can now obtain App Check tokens. The one remaining verification step is the first real Gemini generation call from the live site, plus Gemini Nano verification in Chrome Desktop 139+. Demo mode remains available as a fallback. See **§6** for details.
 
 ---
 
@@ -208,29 +208,22 @@ Current verified checks include Privacy Shield redaction, mock brief extraction,
   - A live probe against Google's Firebase Installations endpoint returned **HTTP 200** and issued refresh/auth tokens for this project + API key + app ID — the project is real and accepting this app.
   - `npm test` passes and the local server serves the app shell and all modules with HTTP 200.
 
-**Still remaining — App Check (blocks real Gemini calls):**
+**Done — App Check production registered and wired (25 Nov 2026).**
 
-Firebase AI Logic enforces App Check, so generation will fail until one of these is in place:
+- The `ClearBrief Web` app is registered in **Firebase Console → Security → App Check** with the **reCAPTCHA Enterprise** provider (Fraud Defense) for the production domain `jeffboyz.github.io`.
+- The public site key is set as the default `recaptchaEnterpriseSiteKey` in [`src/config.js`](src/config.js) — the only place it appears in the codebase (a runtime override still takes precedence; debug mode stays **off** by default in production).
+- [`src/firebase-ai.js`](src/firebase-ai.js) initializes App Check — `initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(siteKey), isTokenAutoRefreshEnabled: true })` — **before** `getAI` is called, per the official Firebase AI Logic docs. The localhost debug-provider path (`self.FIREBASE_APPCHECK_DEBUG_TOKEN` + `DebugProvider`) is preserved for local development, and demo/mock mode is untouched.
 
-1. **Localhost development — Debug Provider token.**
-   - Run the app on `http://127.0.0.1:4173` in Chrome with App Check debug mode enabled (`appCheckDebug: true` via the runtime override, or the debug path in `src/firebase-ai.js`).
-   - On first run, Firebase prints a debug token in the browser console.
-   - Register that token in **Firebase Console → Security → App Check → Apps → ClearBrief Web → Manage debug tokens**.
-   - Never commit the debug token to the repo.
-2. **Production — reCAPTCHA Enterprise.**
-   - Create a score-based reCAPTCHA Enterprise web key for the production domain.
-   - Register it as the App Check provider for the web app in the Console.
-   - Put the site key into the runtime config as `recaptchaEnterpriseSiteKey` and make sure debug mode is **off** in production.
+**Still remaining — verification only (the wiring is complete):**
 
-**Also still to verify (needs the owner's Chrome Desktop):**
-
-- First real `generateContent` call succeeding (confirms the Gemini Developer API backend is fully enabled for the project and App Check passes end to end).
-- Gemini Nano availability + on-device inference in Chrome Desktop 139+ (Prompt API), including the model download on first use.
+- **First real Gemini call from the live site.** A real `generateContent` call from https://jeffboyz.github.io/clearbrief/ succeeding end to end — this confirms the Gemini Developer API backend and production App Check pass together. (Run by the project owner via browser.)
+- **Gemini Nano in Chrome Desktop 139+.** Availability + on-device inference via the Prompt API, including the model download on first use, still needs the owner's Chrome Desktop.
+- **Optional, localhost only — Debug Provider token.** For local development against the real backend: run the app on `http://127.0.0.1:4173` with App Check debug mode enabled (`appCheckDebug: true` via the runtime override); Firebase prints a debug token in the browser console, which the owner registers under **Firebase Console → Security → App Check → Apps → ClearBrief Web → Manage debug tokens**. Never commit the debug token to the repo.
 
 ### Deployment plan
 
-- Deploy the static app to **GitHub Pages from a separate public repo named `clearbrief`** (this working folder stays the development source; the deployment repo is created by the project owner — not yet created).
-- The production domain will be the GitHub Pages domain for that repo; register it in reCAPTCHA Enterprise / App Check before announcing the URL.
+- The static app is deployed to **GitHub Pages from a separate public repo named `clearbrief`** (this working folder stays the development source): https://jeffboyz.github.io/clearbrief/
+- The production domain `jeffboyz.github.io` is registered in the reCAPTCHA Enterprise key and the App Check registration (see above).
 - Firebase Hosting remains an alternative if GitHub Pages causes App Check domain issues.
 
 ### Runtime config alternative
