@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="ClearBrief turns messy meetings and chats into structured decision briefs with hybrid on-device and cloud AI." />
+  <title>ClearBrief — Hybrid AI Decision Briefs</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="ClearBrief home">
+      <span class="brand-mark">CB</span>
+      <span>ClearBrief</span>
+    </a>
+    <div class="header-badges" aria-label="Product highlights">
+      <span>Firebase AI Logic</span>
+      <span>Gemini Nano + Cloud</span>
+      <span>Privacy Shield</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">#BuildHybridAI 2026 · Web / Chrome</p>
+        <h1>Messy conversation in.<br />Clear decisions out.</h1>
+        <p class="hero-copy">
+          ClearBrief turns meeting notes, team chats, and study material into a structured decision brief.
+          It starts privately on-device with Gemini Nano, then lets the user explicitly deepen the result
+          with cloud Gemini through Firebase AI Logic.
+        </p>
+      </div>
+      <div class="hero-card" aria-label="How ClearBrief routes AI work">
+        <div class="route-step">
+          <span class="step-number">1</span>
+          <div><strong>Private first pass</strong><p>Instant extraction on-device when Gemini Nano is available.</p></div>
+        </div>
+        <div class="route-step">
+          <span class="step-number">2</span>
+          <div><strong>Privacy Shield</strong><p>Emails, phone numbers, and secrets are masked before optional cloud processing.</p></div>
+        </div>
+        <div class="route-step">
+          <span class="step-number">3</span>
+          <div><strong>Cloud deepening</strong><p>Firebase AI Logic routes to cloud Gemini for prioritization and polish.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="ClearBrief workspace">
+      <form id="composer" class="panel composer">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Composer</p>
+            <h2>Source material</h2>
+          </div>
+          <span id="wordCount" class="count-pill">0 words</span>
+        </div>
+
+        <label>
+          Brief title
+          <input id="titleInput" type="text" value="Product launch sync" autocomplete="off" />
+        </label>
+
+        <div class="field-grid">
+          <label>
+            Source type
+            <select id="typeInput">
+              <option>Meeting notes</option>
+              <option>Team chat</option>
+              <option>Study notes</option>
+              <option>Research notes</option>
+              <option>Customer conversation</option>
+            </select>
+          </label>
+          <label>
+            Audience
+            <select id="audienceInput">
+              <option>Leadership team</option>
+              <option>Project team</option>
+              <option>Client</option>
+              <option>Personal review</option>
+            </select>
+          </label>
+          <label>
+            Output language
+            <select id="languageInput">
+              <option>English</option>
+              <option>Indonesian</option>
+              <option>English with Indonesian names preserved</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Paste notes, a chat export, or study material
+          <textarea id="sourceInput" rows="15" placeholder="Paste the conversation or notes here..."></textarea>
+        </label>
+
+        <div class="button-row">
+          <button id="sampleButton" class="button secondary" type="button">Load demo source</button>
+          <button id="clearButton" class="button ghost" type="button">Clear</button>
+        </div>
+
+        <fieldset class="route-fieldset">
+          <legend>AI route</legend>
+          <div class="route-grid">
+            <label class="route-card">
+              <input type="radio" name="route" value="hybrid" checked />
+              <span><strong>Hybrid smart</strong><small>Prefer on-device, fall back to cloud.</small></span>
+            </label>
+            <label class="route-card">
+              <input type="radio" name="route" value="device" />
+              <span><strong>Private device</strong><small>On-device only. No cloud fallback.</small></span>
+            </label>
+            <label class="route-card">
+              <input type="radio" name="route" value="cloud-first" />
+              <span><strong>Cloud first</strong><small>Prefer cloud quality, device fallback.</small></span>
+            </label>
+            <label class="route-card">
+              <input type="radio" name="route" value="cloud" />
+              <span><strong>Cloud quality</strong><small>Cloud Gemini only through Firebase.</small></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="toggle-stack">
+          <label class="toggle-row">
+            <input id="privacyToggle" type="checkbox" checked />
+            <span><strong>Privacy Shield before cloud</strong><small>Mask emails, phone numbers, and common secret formats.</small></span>
+          </label>
+          <label class="toggle-row">
+            <input id="demoToggle" type="checkbox" />
+            <span><strong>Force demo mode</strong><small>Use the local mock engine so the full flow works without Firebase.</small></span>
+          </label>
+        </div>
+
+        <div class="action-row">
+          <button id="generateButton" class="button primary" type="submit">Generate brief</button>
+          <button id="twoPassButton" class="button accent" type="button">Run private → cloud two-pass</button>
+        </div>
+
+        <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+      </form>
+
+      <section class="panel output-panel" aria-label="Generated brief">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Output</p>
+            <h2>Decision brief</h2>
+          </div>
+          <span id="outputStatus" class="status-pill neutral">Ready</span>
+        </div>
+
+        <div id="metadata" class="metadata-grid" hidden></div>
+
+        <div id="emptyState" class="empty-state">
+          <div class="empty-icon">✦</div>
+          <h3>Your structured brief will appear here</h3>
+          <p>Load the demo source and run a brief. In demo mode, ClearBrief simulates the on-device and cloud passes locally so every product interaction can be tested before Firebase is connected.</p>
+        </div>
+
+        <article id="briefOutput" class="brief-output" hidden></article>
+
+        <div id="exportActions" class="button-row export-actions" hidden>
+          <button id="copyButton" class="button secondary" type="button">Copy Markdown</button>
+          <button id="downloadMdButton" class="button secondary" type="button">Download .md</button>
+          <button id="downloadJsonButton" class="button secondary" type="button">Download .json</button>
+          <button id="saveButton" class="button ghost" type="button">Save locally</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="lower-grid">
+      <article class="panel connection-panel">
+        <p class="eyebrow">Connection status</p>
+        <h2>Hybrid readiness</h2>
+        <dl>
+          <div><dt>Firebase AI Logic</dt><dd id="firebaseStatus">Checking configuration…</dd></div>
+          <div><dt>App Check</dt><dd id="appCheckStatus">Waiting for Firebase setup</dd></div>
+          <div><dt>Chrome Gemini Nano</dt><dd id="nanoStatus">Checking Prompt API…</dd></div>
+          <div><dt>Model download</dt><dd id="downloadStatus">Not started</dd></div>
+        </dl>
+        <button id="prepareButton" class="button secondary" type="button">Prepare on-device model</button>
+        <p class="fine-print">Firebase AI Logic on-device inference requires Chrome Desktop 139+ and may require enabling the Gemini Nano Prompt API flag during development.</p>
+      </article>
+
+      <article class="panel history-panel">
+        <div class="panel-heading compact">
+          <div>
+            <p class="eyebrow">Local only</p>
+            <h2>Saved briefs</h2>
+          </div>
+          <button id="clearHistoryButton" class="button ghost small" type="button">Clear</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <p class="muted">No saved briefs yet. Saved items stay in this browser's local storage.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>How Firebase AI Logic is used:</strong> ClearBrief initializes Firebase App Check, creates a Gemini model with an inference mode, and uses structured JSON output. Hybrid mode prefers Gemini Nano on-device and falls back to cloud Gemini; the two-pass workflow makes the privacy and quality tradeoff explicit.</p>
+  </footer>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
