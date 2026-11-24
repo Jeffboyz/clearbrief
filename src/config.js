@@ -36,7 +36,11 @@ export const aiConfig = {
   appCheck: {
     debug: Boolean(runtimeConfig?.appCheckDebug),
     debugToken: runtimeConfig?.appCheckDebugToken || '',
-    recaptchaEnterpriseSiteKey: runtimeConfig?.recaptchaEnterpriseSiteKey || ''
+    // Public reCAPTCHA Enterprise site key for Firebase App Check, registered
+    // in the Firebase Console for the "ClearBrief Web" app with the
+    // production domain jeffboyz.github.io. Site keys are public
+    // identifiers, not secrets. A runtime override still takes precedence.
+    recaptchaEnterpriseSiteKey: runtimeConfig?.recaptchaEnterpriseSiteKey || '6LfrujAuAAAAAOLerVfj-3q-A00ENnFgQGpsHIX7'
   }
 };
 
